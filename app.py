@@ -22,6 +22,14 @@ from widgets import *
 usertxt=""
 passtext=""
 widgets = None
+usercont=0
+userid=[]
+#DB CONN
+conn = psycopg2.connect(dbname="safechest",user="postgres", password="123", host="localhost")
+conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+cursor = conn.cursor()
+
+print("conectado")
 #SIGN UP SCREEN
 class SignScreen(QMainWindow):
     def __init__(self):
@@ -39,17 +47,20 @@ class SignScreen(QMainWindow):
     def GetTextFromPassword(self):
         return self.ui.sign_pass_txt.text()
     def ShowLogScreen(self):
-        global usertxt
-        global passtext
+        global usercont
+        usercont+=1
+        
         ####INSERT INTO USERS VA ACA
         usertxt = self.GetTextFromUser()
         passtext = self.GetTextFromPassword()
-        print(usertxt)
-        print(passtext)
+        cursor.execute("INSERT INTO users (name, password) VALUES('"+usertxt+"'"+","+"'"+passtext+"'"+")")
+        print("funciona insert into users")
         #######################################
+        
         self.close()
         self.log= LogScreen()
         self.log.show()
+
 #LOG SCREEN
 class LogScreen(QMainWindow):
     def __init__(self):
@@ -88,6 +99,7 @@ class LogScreen(QMainWindow):
         return self.ui.pass_login_txt.text()
 
     def LogIN(self):
+        global userid
         loguser= self.GetTextFromUserLog()
         logpass= self.GetTextFromPasswordLog()
         
@@ -96,11 +108,25 @@ class LogScreen(QMainWindow):
         print(usertxt)
         print(passtext)
         #dentro del if se hace un exist de select * from users where user= loguser and password= logpasss
-        if(loguser == usertxt and logpass== passtext ):
+        cursor.execute("SELECT * FROM users WHERE name= "+"'"+loguser+"' and password= "+"'"+logpass+"'")
+        
+        if(cursor.fetchone()[0]):
+            userid= self.GetUserId()
+            print(userid)
             self.close()
             self.main=MainWindow()
             self.main.show()
         #########################################################################################################
+    def GetUserId(self):
+        
+        loguser= self.GetTextFromUserLog()
+        logpass= self.GetTextFromPasswordLog()
+        print(logpass)
+        print(loguser)
+        cursor.execute("SELECT * FROM users WHERE name= "+"'"+loguser+"' and password= "+"'"+logpass+"'")
+        
+        return cursor.fetchone()[0]
+        
 
 
 
@@ -256,7 +282,21 @@ class MainWindow(QMainWindow):
             "}\n"
         )
         self.siteIns.setText("Agregar Sitio")
-        #self.siteIns.clicked.connect(self.InsertSite)
+        self.siteIns.clicked.connect(self.InsertSite)
+                ###################mensaje exito##################
+        self.Addm= QLabel(self.ui.new_page)
+        self.Addm.setObjectName("addm")
+        self.Addm.setGeometry(400,600,661,61)
+        self.Addm.setStyleSheet("\n"
+"#addm{\n"
+"	color: rgb(221, 221, 221);\n"
+"	font: 12pt \"Poor Richard\";\n"
+"}\n"
+"\n")
+        
+        self.Addm.setText("INGRESO   SU   SITIO")
+        self.Addm.setVisible(False)
+        self.ui.btn_new.released.connect(self.Addm.setVisible(False))
         #////////////////////////////////Crear ADD Site//////////////////////////////////////
         #////////////////////////////////Crear View Sites//////////////////////////////////////
                 
@@ -276,17 +316,18 @@ class MainWindow(QMainWindow):
                       
         self.viewSites= QLabel(self.ui.home)
         self.viewSites.setObjectName("viewsites")
-        self.viewSites.setGeometry(400,150,661,61)
+        self.viewSites.setGeometry(400,-20,800,800)
         self.viewSites.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.viewSites.setStyleSheet("\n"
 "#viewsites{\n"
 "	color: rgb(221, 221, 221);\n"
-"	font: 12pt \"Poor Richard\";\n"
+"	font: 16pt \"Segoe UI\";\n"
 "}\n"
 "\n")
-        #self.ui.btn_home.clicked.connect(self.getSites())
-        self.viewSites.setText("Aqui van los sitios de la DB")
+        self.ui.btn_home.clicked.connect(self.getSites)
+        self.viewSites.setText("Aqui van los sitios de la DB del id: "+str(userid))
         #////////////////////////////////Crear View Sites//////////////////////////////////////
+        
         self.show()
 
         # SET CUSTOM THEME
@@ -311,12 +352,45 @@ class MainWindow(QMainWindow):
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
     #------------------- Insert Site Function-------------------------------------------#
-    #def InsertSite(self):
+    def GetSiteName(self):
+        return self.siteName.text()
+    def GetSiteUrl(self):
+        return self.siteUrl.text()
+    def GetSitePass(self):
+        return self.sitePass.text()
+    def InsertSite(self):
+        name=self.GetSiteName()
+        url= self.GetSiteUrl()
+        pas= self.GetSitePass()
+        cursor.execute("INSERT INTO sites(name,url,pass,id_user) values('"+name+"'"+","+"'"+url+"'"+","+"'"+pas+"'"+","+str(userid)+")")
+        conn.commit()
+        print("ingresado")
+        
     
     ######################################################################################
         #------------------- View Site Function-------------------------------------------#
-    #def getSites(self):
-    
+    def getSites(self):
+                
+        cursor.execute("select name from sites where id_user= "+str(userid))
+        n = cursor.fetchall()
+        cursor.execute("select id from sites where id_user= "+str(userid))
+        ids = cursor.fetchall()
+        
+        cursor.execute("select url from sites where id_user= "+str(userid))
+        u = cursor.fetchall()
+
+        
+        cursor.execute("select pass from sites where id_user= "+str(userid))
+        p = cursor.fetchall()
+
+        cont=1
+        s=""
+        while(cont <= len(n)):
+            
+            s+=" No.  " +str(ids[cont - 1][0])+"   Sitio:  "+ str(n[cont - 1][0])+"\n" +" URL:  "+ str(u[cont - 1][0])+"\n" +" Password:  "+ str(p[cont - 1][0])+"\n\n"
+            
+            cont = cont + 1
+        self.viewSites.setText(s)
     ######################################################################################
     # ///////////////////////////////////////////////////////////////
     def buttonClick(self):
