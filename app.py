@@ -316,8 +316,8 @@ class MainWindow(QMainWindow):
                       
         self.viewSites= QLabel(self.ui.home)
         self.viewSites.setObjectName("viewsites")
-        self.viewSites.setGeometry(400,-20,800,800)
-        self.viewSites.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.viewSites.setGeometry(400,150,800,800)
+        self.viewSites.setAlignment(Qt.AlignLeading|Qt.AlignLeft)
         self.viewSites.setStyleSheet("\n"
 "#viewsites{\n"
 "	color: rgb(221, 221, 221);\n"
