@@ -81,6 +81,7 @@ class LogScreen(QMainWindow):
         self.ui.loginButton.clicked.connect(self.LogIN)
         #signup button
         self.ui.signButton.clicked.connect(self.ShowSignScreen)
+        
 
 
 
@@ -109,8 +110,11 @@ class LogScreen(QMainWindow):
         print(passtext)
         #dentro del if se hace un exist de select * from users where user= loguser and password= logpasss
         cursor.execute("SELECT * FROM users WHERE name= "+"'"+loguser+"' and password= "+"'"+logpass+"'")
-        
-        if(cursor.fetchone()[0]):
+        x = cursor.fetchone()
+        if not(x):
+            #mostrar el error
+            return
+        else:
             userid= self.GetUserId()
             print(userid)
             self.close()
