@@ -256,7 +256,7 @@ background-color:rgb(56, 58, 89)
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../pyq6/resources.qrc">
+        <iconset>
          <normaloff>:/icons/images/icons/icon_close.png</normaloff>:/icons/images/icons/icon_close.png</iconset>
        </property>
        <property name="iconSize">
@@ -303,7 +303,7 @@ background-color:rgb(56, 58, 89);
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../pyq6/resources.qrc">
+        <iconset>
          <normaloff>:/icons/images/icons/icon_minimize.png</normaloff>:/icons/images/icons/icon_minimize.png</iconset>
        </property>
        <property name="iconSize">
@@ -313,13 +313,34 @@ background-color:rgb(56, 58, 89);
         </size>
        </property>
       </widget>
+      <widget class="QLabel" name="errorPopup">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>310</y>
+         <width>381</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Sans Serif</family>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../pyq6/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
