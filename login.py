@@ -150,7 +150,14 @@ class Ui_LogScreen(object):
         icon1.addFile(u":/icons/images/icons/icon_minimize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.minimizeAppBtn.setIcon(icon1)
         self.minimizeAppBtn.setIconSize(QSize(20, 20))
-
+        self.errorPopup = QLabel(self.dropShadowFrame)
+        self.errorPopup.setObjectName(u"errorPopup")
+        self.errorPopup.setEnabled(True)
+        self.errorPopup.setGeometry(QRect(160, 310, 381, 20))
+        font4 = QFont()
+        font4.setFamilies([u"MS Sans Serif"])
+        font4.setBold(True)
+        self.errorPopup.setFont(font4)
         self.verticalLayout.addWidget(self.dropShadowFrame)
 
         LogScreen.setCentralWidget(self.centralwidget)

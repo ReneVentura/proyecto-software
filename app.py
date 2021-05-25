@@ -3,6 +3,7 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import os.path 
+from pw_gen import pw_gen
 
 import sys
 import platform
@@ -53,7 +54,7 @@ class SignScreen(QMainWindow):
         ####INSERT INTO USERS VA ACA
         usertxt = self.GetTextFromUser()
         passtext = self.GetTextFromPassword()
-        cursor.execute("INSERT INTO users (name, password) VALUES('"+usertxt+"'"+","+"'"+passtext+"'"+")")
+        cursor.execute("INSERT INTO users (name, password) VALUES(%s, %s)", (usertxt, pw_gen(passtext)))
         print("funciona insert into users")
         #######################################
         
@@ -109,10 +110,10 @@ class LogScreen(QMainWindow):
         print(usertxt)
         print(passtext)
         #dentro del if se hace un exist de select * from users where user= loguser and password= logpasss
-        cursor.execute("SELECT * FROM users WHERE name= "+"'"+loguser+"' and password= "+"'"+logpass+"'")
+        cursor.execute("SELECT * FROM users WHERE name= %s and password = %s", (loguser, pw_gen(logpass)))
         x = cursor.fetchone()
         if not(x):
-            #mostrar el error
+            self.ui.errorPopup.setText('*Incorrect username or password')
             return
         else:
             userid= self.GetUserId()
@@ -127,7 +128,7 @@ class LogScreen(QMainWindow):
         logpass= self.GetTextFromPasswordLog()
         print(logpass)
         print(loguser)
-        cursor.execute("SELECT * FROM users WHERE name= "+"'"+loguser+"' and password= "+"'"+logpass+"'")
+        cursor.execute("SELECT * FROM users WHERE name= %s and password= %s", (loguser, pw_gen(logpass)))
         
         return cursor.fetchone()[0]
         
@@ -366,7 +367,7 @@ class MainWindow(QMainWindow):
         name=self.GetSiteName()
         url= self.GetSiteUrl()
         pas= self.GetSitePass()
-        cursor.execute("INSERT INTO sites(name,url,pass,id_user) values('"+name+"'"+","+"'"+url+"'"+","+"'"+pas+"'"+","+str(userid)+")")
+        cursor.execute("INSERT INTO sites(name,url,pass,id_user) values(%s , %s, %s, %s)", (name, url, pw_gen(pas), userid))
         conn.commit()
         print("ingresado")
         
